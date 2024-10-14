@@ -120,6 +120,7 @@ public class RoleController {
             Role role = optionalRole.get();
             role.setName(roleDetails.getName());
             role.setDescription(roleDetails.getDescription());
+            role.setColor(roleDetails.getColor());
             Role updatedRole = roleRepository.save(role);
             return ResponseEntity.ok(updatedRole);
         } else {
