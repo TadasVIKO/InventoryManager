@@ -11,10 +11,12 @@ public class Role {
     private int id;
     private String name;
     private String description;
+    private String color;
 
-    public Role(String name, String description) {
+    public Role(String name, String description, String color) {
         this.name = name;
         this.description = description;
+        this.color = color;
     }
 
     public Role() {}
@@ -41,5 +43,13 @@ public class Role {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 }
