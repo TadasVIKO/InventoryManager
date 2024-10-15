@@ -168,6 +168,7 @@ public class EmployeeController {
             employee.setAddress2(employeeDetails.getAddress2());
             employee.setEmail(employeeDetails.getEmail());
             employee.setMobilePhone(employeeDetails.getMobilePhone());
+            employee.setRoleList(employeeDetails.getRoleList());
 
             Employee updatedEmployee = employeeRepository.save(employee);
             return ResponseEntity.ok(updatedEmployee);
@@ -230,41 +231,6 @@ public class EmployeeController {
         } else {
             throw new EmployeeNotFoundException(employeeId);
         }
-    }
-
-    @Operation(
-            summary = "Add or remove roles for an employee",
-            description = "Adds or removes roles to/from an employee based on the provided employee ID and role IDs"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Employee roles updated successfully",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = Employee.class))}),
-            @ApiResponse(responseCode = "404", description = "Employee or Role not found",
-                    content = @Content)
-    })
-    @PutMapping("/{employeeId}/roles")
-    public ResponseEntity<Employee> updateEmployeeRoles(
-            @PathVariable Long employeeId,
-            @RequestParam List<Long> roleIds,
-            @RequestParam(defaultValue = "false") boolean removeRoles) {
-
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException(employeeId));
-
-        List<Role> roles = roleRepository.findAllById(roleIds);
-        if (roles.size() != roleIds.size()) {
-            throw new RoleNotFoundException(null);
-        }
-
-        if (removeRoles) {
-            employee.getRoleList().removeAll(roles);
-        } else {
-            employee.getRoleList().addAll(roles);
-        }
-
-        Employee updatedEmployee = employeeRepository.save(employee);
-        return ResponseEntity.ok(updatedEmployee);
     }
 
     @Operation(
