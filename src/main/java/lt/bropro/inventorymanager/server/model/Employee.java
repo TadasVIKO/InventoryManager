@@ -28,7 +28,7 @@ public class Employee implements UserDetails {
     private List<Role> roleList;
     private AuthorityRole authRole;
 
-    public Employee(String firstName, String lastName, String address1, String address2, String email, String mobilePhone, String password) {
+    public Employee(String firstName, String lastName, String address1, String address2, String email, String mobilePhone, String password, List<Role> roleList) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.address1 = address1;
@@ -36,6 +36,7 @@ public class Employee implements UserDetails {
         this.email = email;
         this.mobilePhone = mobilePhone;
         this.password = password;
+        this.roleList = roleList;
     }
 
     public Employee() {}
