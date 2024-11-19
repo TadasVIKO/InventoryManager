@@ -10,6 +10,7 @@ import lt.bropro.inventorymanager.server.database.ItemRepository;
 import lt.bropro.inventorymanager.server.exceptions.ItemNotFoundException;
 import lt.bropro.inventorymanager.server.exceptions.RoleNotFoundException;
 import lt.bropro.inventorymanager.server.model.Item;
+import lt.bropro.inventorymanager.server.model.ItemCategory;
 import lt.bropro.inventorymanager.server.model.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -76,9 +77,17 @@ public class ItemController {
     })
     @PostMapping
     public ResponseEntity<Item> addItem(@RequestBody Item item) {
+        if (item.getItemCategory() != null && item.getItemCategory().getId() != 0) {
+            ItemCategory existingCategory = item.getItemCategory();
+            item.setItemCategory(existingCategory);
+        } else {
+            item.setItemCategory(null);
+        }
+
         Item savedItem = itemRepository.save(item);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedItem);
     }
+
 
     @Operation(
             summary = "Update an item",
@@ -96,15 +105,29 @@ public class ItemController {
         Optional<Item> optionalItem = itemRepository.findById(itemId);
         if (optionalItem.isPresent()) {
             Item item = optionalItem.get();
+
+            // Update basic fields
             item.setName(itemDetails.getName());
             item.setDescription(itemDetails.getDescription());
-            item.setItemCategory(itemDetails.getItemCategory());
+
+            // Update category if present in request
+            if (itemDetails.getItemCategory() != null && itemDetails.getItemCategory().getId() != 0) {
+                ItemCategory existingCategory = itemDetails.getItemCategory();
+                item.setItemCategory(existingCategory); // Set reference only
+            }
+
+            // If no category is sent, handle appropriately
+            if (itemDetails.getItemCategory() == null) {
+                item.setItemCategory(null); // Remove association if necessary
+            }
+
             Item updatedItem = itemRepository.save(item);
             return ResponseEntity.ok(updatedItem);
         } else {
             throw new ItemNotFoundException(itemId);
         }
     }
+
 
     @Operation(
             summary = "Delete an item",
