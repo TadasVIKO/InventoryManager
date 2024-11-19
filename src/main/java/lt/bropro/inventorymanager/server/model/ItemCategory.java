@@ -19,7 +19,7 @@ public class ItemCategory {
 
     public ItemCategory() {}
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 

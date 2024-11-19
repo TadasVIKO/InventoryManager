@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lt.bropro.inventorymanager.server.database.ItemCategoryRepository;
 import lt.bropro.inventorymanager.server.database.ItemRepository;
 import lt.bropro.inventorymanager.server.exceptions.ItemNotFoundException;
 import lt.bropro.inventorymanager.server.exceptions.RoleNotFoundException;
@@ -27,6 +28,9 @@ public class ItemController {
 
     @Autowired
     private ItemRepository itemRepository;
+
+    @Autowired
+    private ItemCategoryRepository itemCategoryRepository;
     
     @Operation(
             summary = "Get all items.",
@@ -105,20 +109,13 @@ public class ItemController {
         Optional<Item> optionalItem = itemRepository.findById(itemId);
         if (optionalItem.isPresent()) {
             Item item = optionalItem.get();
-
-            // Update basic fields
             item.setName(itemDetails.getName());
             item.setDescription(itemDetails.getDescription());
 
-            // Update category if present in request
-            if (itemDetails.getItemCategory() != null && itemDetails.getItemCategory().getId() != 0) {
-                ItemCategory existingCategory = itemDetails.getItemCategory();
-                item.setItemCategory(existingCategory); // Set reference only
-            }
-
-            // If no category is sent, handle appropriately
-            if (itemDetails.getItemCategory() == null) {
-                item.setItemCategory(null); // Remove association if necessary
+            // Fetch the category by its ID
+            if (itemDetails.getItemCategory() != null) {
+                Optional<ItemCategory> category = itemCategoryRepository.findById(itemDetails.getItemCategory().getId());
+                category.ifPresent(item::setItemCategory);
             }
 
             Item updatedItem = itemRepository.save(item);
@@ -127,6 +124,7 @@ public class ItemController {
             throw new ItemNotFoundException(itemId);
         }
     }
+
 
 
     @Operation(
